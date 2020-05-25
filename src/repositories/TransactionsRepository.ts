@@ -24,22 +24,21 @@ class TransactionsRepository {
   }
 
   public getBalance(): Balance {
-    const income = this.transactions.reduce((currentValue, transaction) => {
-      return transaction.type == 'income'
-        ? currentValue + transaction.value
-        : currentValue
-    }, 0);
-    const outcome = this.transactions.reduce((currentValue, transaction) => {
-      return transaction.type == 'outcome'
-        ? currentValue + transaction.value
-        : currentValue
-    }, 0);
+    const { income, outcome } = this.transactions.reduce((totals, transaction) => {
+
+      const { type, value } = transaction;
+
+      if (type === 'income') totals.income += value;
+      if (type === 'outcome') totals.outcome += value;
+
+      return totals;
+    }, {
+      income: 0,
+      outcome: 0
+    });
+
     const total = income - outcome;
-    return {
-      income,
-      outcome,
-      total
-    }
+    return { income, outcome, total };
   }
 
   public create({ title, type, value }: CreateTransactionDTO): Transaction {

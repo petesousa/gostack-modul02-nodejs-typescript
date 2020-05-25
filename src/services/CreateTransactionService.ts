@@ -15,8 +15,13 @@ class CreateTransactionService {
   }
 
   public execute({ title, type, value }: TransactionDTO): Transaction {
-    const balance = this.transactionsRepository.getBalance();
-    if (type === 'outcome' && value > balance.total) {
+
+    if(!['income', 'outcome'].includes(type)) {
+      throw Error('Invalid transaction type');
+    }
+
+    const { total } = this.transactionsRepository.getBalance();
+    if (type === 'outcome' && value > total) {
       throw Error('Insufficient funds');
     }
 
